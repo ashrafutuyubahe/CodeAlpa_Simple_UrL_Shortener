@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>   
+</head>
+<body>
+    <form action="/postUrl" method="post" id="post-form" class="post-form">
+        <label for="url">Your URL</label>
+        <input type="text" placeholder="Enter the URL..." id="url" name="theURL" required>
+        <button type="submit">View the short URL</button>
+        <div id="shortUrlContainer"></div>
+    </form>
+
+    <script>
+        $(document).ready(function(){
+            $(".post-form").submit(function(event){
+                event.preventDefault();
+                const theURL = $("#url").val();  
+                $.ajax({
+                    url: "/postUrl",
+                    type: "post",
+                    data: $(this).serialize(),
+                    success: function(response){
+                        alert(response.shortUrl);
+                        const shortUrl = response.shortUrl;
+                        const shortId = response.shortId;
+                        
+                        const link = $('<a>').attr('href', '#').attr('id', 'shortUrlLink').text(shortUrl);
+                        
+                     
+                        $('#shortUrlContainer').empty().append(link);
+
+                       
+                        $('#shortUrlLink').click(function(e) {
+                            e.preventDefault();
+                            $.ajax({
+                                type: 'get',
+      F                          url: '/urlClicked?id=' + shortId,
+                                success: function(response){
+                                    console.log(response);
+                                    alert(response);
+                                    window.location.href = response;
+                                },
+                                error: function(error){
+                                    console.log(error);
+                                }
+                            });
+                        });
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
