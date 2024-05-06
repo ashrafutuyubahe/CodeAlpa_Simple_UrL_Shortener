@@ -90,7 +90,7 @@ app.get("/getUrls", (req, res) => {
         short: row.short,
       };
     });
-    console.log(urls);
+    
 
     res.json(urls);
   });
