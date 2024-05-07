@@ -18,6 +18,8 @@
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "nodemon": "^3.1.0",
-    "short-id": "^0.1.0-1"
+    "short-id": "^0.1.0-1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }
