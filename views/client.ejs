@@ -55,6 +55,7 @@
             data: $(this).serialize(),
             success: function (response) {
               if (response == "Enter the user id") {
+                console.log(response);
                 alert(response);
               }
               const shortUrl = response.shortUrl;
@@ -90,6 +91,9 @@
         $("#viewUrl").click(function (e) {
           e.preventDefault();
           const user_id = $("#user_id").val();
+          if(!user_id){
+          return   alert('enter  the user ID')
+          }
           $.ajax({
             type: "get",
             url: "/getUrls",
@@ -97,6 +101,10 @@
               user_id: user_id,
             },
             success: function (response) {
+              if(response=='Enter the user id'){
+                console.log(response);
+                alert(response);
+              }
               const fullurl = response[0].full;
               const short = response[0].short;
               

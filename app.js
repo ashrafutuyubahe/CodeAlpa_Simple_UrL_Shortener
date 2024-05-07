@@ -5,6 +5,7 @@ const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const db = require("./models/dbconnection");
 const shortid = require("short-id");
+const jwt= require('jsonwebtoken');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -75,6 +76,7 @@ app.get("/getUrls", (req, res) => {
 
   if (!user_id) {
     return res.status(400).send("Enter the user id");
+    
   }
 
   const findUrls = "SELECT full, short FROM urls WHERE user_id = ?";
