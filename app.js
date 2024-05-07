@@ -17,15 +17,45 @@ app.get("/", (req, res) => {
   res.render("client");
 });
 
+
+//authmiddleware
+
+function authenticateUser(req, res, next) {
+  const secretKey = 'privatekey';
+  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+   
+  if (!token) {
+    return res.status(401).send('Token is missing. Please provide a valid token.');
+  }
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).send('Token has expired. Please provide a new token.');
+      } else {
+        return res.status(401).send('Invalid token: ' + err.message); // Sending the error message as a string
+      }
+    }
+
+    req.user = decoded;
+    next();
+  });
+}
+
+
+const secretKey='privatekey';
+
 app.post("/postUrl", (req, res) => {
   const theUrl = req.body.theURL;
   const user_id = req.body.user_id;
   const shortId = shortid.generate();
   console.log(user_id);
 
-  if (!user_id) {
-    return res.send("you have to provide the user id");
-  }
+  const expiresInDuration = 2 * 60
+  const token= jwt.sign({user_id:user_id},secretKey,{expiresIn:expiresInDuration});
+
+
+  
 
   const insertQuery = "INSERT INTO Urls (full, short,user_id) VALUES (?, ?,?)";
   db.query(insertQuery, [theUrl, shortId, user_id], (error, result) => {
@@ -44,8 +74,8 @@ app.post("/postUrl", (req, res) => {
       if (result.length === 0) {
         return res.status(404).send("Short ID not found");
       }
-
-      res.json({ shortUrl: result[0].short, shortId: result[0].id });
+     console.log(token);
+      res.json({ token,shortUrl: result[0].short, shortId: result[0].id });
     });
   });
 });
@@ -70,18 +100,18 @@ app.get("/urlClicked", (req, res) => {
   });
 });
 
-app.get("/getUrls", (req, res) => {
-  const user_id = req.query.user_id;
+app.get("/getUrls",authenticateUser, (req, res) => {
+  const user_id = req.user.user_id;
+   if(!user_id){
+      
+   } 
   console.log(user_id);
 
-  if (!user_id) {
-    return res.status(400).send("Enter the user id");
-    
-  }
+  
 
   const findUrls = "SELECT full, short FROM urls WHERE user_id = ?";
   db.query(findUrls, [user_id], (error, result) => {
-    if (error) {
+   if (error) {
       console.error(error);
       return res.status(500).send("Error retrieving URLs");
     }

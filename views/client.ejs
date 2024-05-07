@@ -60,6 +60,10 @@
               }
               const shortUrl = response.shortUrl;
               const shortId = response.shortId;
+              const token = response.token;
+              console.log(token);
+
+              localStorage.setItem("jwtToken", token);
 
               const link = $("<a>")
                 .attr("href", "#")
@@ -91,38 +95,51 @@
         $("#viewUrl").click(function (e) {
           e.preventDefault();
           const user_id = $("#user_id").val();
-          if(!user_id){
-          return   alert('enter  the user ID')
+          const token = localStorage.getItem("jwtToken");
+          if(!user_id || !token){
+            alert('enter the user id');
           }
+
           $.ajax({
             type: "get",
             url: "/getUrls",
-            data: {
-              user_id: user_id,
+            headers: {
+              Authorization: `Bearer ${token}`,
             },
             success: function (response) {
-              if(response=='Enter the user id'){
+              if (
+                response === "Token has expired. Please provide a new token."
+              ) {
+                console.log(response);
+                alert("Token has expired. Please log in again.");
+              } else if (response === "Enter the user id") {
                 console.log(response);
                 alert(response);
-              }
-              const fullurl = response[0].full;
-              const short = response[0].short;
-              
+              } else {
+                const fullurl = response[0].full;
+                const short = response[0].short;
 
-              $("#url-list").append(
-                '<li class="list-group-item">  <a href="' +
-                  fullurl +
-                  '">' +
-                  fullurl +
-                  '</a> ==> <a href="' +
-                  fullurl +
-                  '">' +
-                  short +
-                  "</a></li>"
-              );
+                $("#url-list").append(
+                  '<li class="list-group-item">  <a href="' +
+                    fullurl +
+                    '">' +
+                    fullurl +
+                    '</a> ==> <a href="' +
+                    fullurl +
+                    '">' +
+                    short +
+                    "</a></li>"
+                );
+              }
             },
-            error: function (error) {
-              alert(error);
+            error: function (xhr) {
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                alert("Error: " + xhr.responseJSON.message);
+              } else if (xhr.responseText) {
+                alert("Error: " + xhr.responseText);
+              } else {
+                alert("An error occurred while processing your request.");
+              }
             },
           });
         });
