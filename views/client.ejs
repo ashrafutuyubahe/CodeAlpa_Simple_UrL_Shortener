@@ -96,13 +96,17 @@
           e.preventDefault();
           const user_id = $("#user_id").val();
           const token = localStorage.getItem("jwtToken");
-          if(!user_id || !token){
-            alert('enter the user id');
+          if (!user_id || !token) {
+            alert("enter the user id because your token has expired");
+            return;
           }
 
           $.ajax({
             type: "get",
             url: "/getUrls",
+            data: {
+              user_id: user_id,
+            },
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -110,7 +114,7 @@
               if (
                 response === "Token has expired. Please provide a new token."
               ) {
-                console.log(response);
+                
                 alert("Token has expired. Please log in again.");
               } else if (response === "Enter the user id") {
                 console.log(response);

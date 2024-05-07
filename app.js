@@ -18,27 +18,35 @@ app.get("/", (req, res) => {
 });
 
 
-//authmiddleware
+/
 
 function authenticateUser(req, res, next) {
   const secretKey = 'privatekey';
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+  const newUser_id = req.query.user_id; 
    
   if (!token) {
-    return res.status(401).send('Token is missing. Please provide a valid token.');
+      return res.status(401).send('Token is missing. Please provide a valid token.');
   }
 
   jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).send('Token has expired. Please provide a new token.');
-      } else {
-        return res.status(401).send('Invalid token: ' + err.message); // Sending the error message as a string
-      }
-    }
+      if (err) {
+          if (err.name === 'TokenExpiredError') {
+              if (newUser_id) {
 
-    req.user = decoded;
-    next();
+                res.locals.newUser_id = newUser_id
+                 return;
+                 
+
+              }
+              return res.status(401).send('Token has expired. Please provide a new token.');
+           } else {
+              return res.status(401).send('Invalid token: ' + err.message); // Sending the error message as a string
+          }
+      }
+
+      req.user = decoded;
+      next();
   });
 }
 
@@ -100,32 +108,51 @@ app.get("/urlClicked", (req, res) => {
   });
 });
 
-app.get("/getUrls",authenticateUser, (req, res) => {
+app.get("/getUrls", authenticateUser, (req, res) => {
   const user_id = req.user.user_id;
-   if(!user_id){
-      
-   } 
-  console.log(user_id);
+  const newUser_id = res.locals.newUser_id; 
+  console.log(newUser_id);
 
   
+  if (!user_id) {
+      const newUser_id = req.user_id;     
+   console.log(newUser_id);
+      
+      const findUrls = "SELECT full, short FROM urls WHERE user_id = ?";
+      db.query(findUrls, [newUser_id], (error, result) => {
+          if (error) {
+              console.error(error);
+              return res.status(500).send("Error retrieving URLs");
+          }
 
-  const findUrls = "SELECT full, short FROM urls WHERE user_id = ?";
-  db.query(findUrls, [user_id], (error, result) => {
-   if (error) {
-      console.error(error);
-      return res.status(500).send("Error retrieving URLs");
-    }
+          const urls = result.map((row) => {
+              return {
+                  full: row.full,
+                  short: row.short,
+              };
+          });
 
-    const urls = result.map((row) => {
-      return {
-        full: row.full,
-        short: row.short,
-      };
-    });
-    
+          res.json(urls);
+      });
+  } else {
+      
+      const findUrls = "SELECT full, short FROM urls WHERE user_id = ?";
+      db.query(findUrls, [user_id], (error, result) => {
+          if (error) {
+              console.error(error);
+              return res.status(500).send("Error retrieving URLs");
+          }
 
-    res.json(urls);
-  });
+          const urls = result.map((row) => {
+              return {
+                  full: row.full,
+                  short: row.short,
+              };
+          });
+
+          res.json(urls);
+      });
+  }
 });
 
 app.listen(2000, () => {
