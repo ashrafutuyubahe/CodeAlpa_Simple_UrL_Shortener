@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 });
 
 
-/
+
 
 function authenticateUser(req, res, next) {
   const secretKey = 'privatekey';
