@@ -82,7 +82,7 @@ const secretKey='privatekey';
 /**
  * @swagger
  * /postUrl:
- *   get:
+ *   post:
  *     summary: This API is used for URL storage
  *     description: This API stores the URL entered by the user to the database
  *     responses:
