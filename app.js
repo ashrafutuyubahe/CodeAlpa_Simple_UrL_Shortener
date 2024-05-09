@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const db = require("./models/dbconnection");
 const shortid = require("short-id");
 const jwt= require('jsonwebtoken');
+const authenticateUser= require('./middlewares/authmiddleware')
 
 const swaggerjdc= require('swagger-jsdoc');
 const swagger_ui= require('swagger-ui-express');
@@ -44,38 +45,6 @@ const swaggerSpec = swaggerjdc(options);
 app.use("/api/doc", swagger_ui.serve, swagger_ui.setup(swaggerSpec));
 
 
-
-
-
-function authenticateUser(req, res, next) {
-  const secretKey = 'privatekey';
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-  const newUser_id = req.query.user_id; 
-   
-  if (!token) {
-      return res.status(401).send('Token is missing. Please provide a valid token.');
-  }
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-      if (err) {
-          if (err.name === 'TokenExpiredError') {
-              if (newUser_id) {
-
-                res.locals.newUser_id = newUser_id
-                 return;
-                 
-
-              }
-              return res.status(401).send('Token has expired. Please provide a new token.');
-           } else {
-              return res.status(401).send('Invalid token: ' + err.message); // Sending the error message as a string
-          }
-      }
-
-      req.user = decoded;
-      next();
-  });
-}
 
 
 const secretKey='privatekey';
@@ -149,6 +118,7 @@ app.get("/getUrls", authenticateUser, (req, res) => {
   const user_id = req.user.user_id;
   const newUser_id = res.locals.newUser_id; 
   console.log(newUser_id);
+  console.log(user_id)
 
   
   if (!user_id) {

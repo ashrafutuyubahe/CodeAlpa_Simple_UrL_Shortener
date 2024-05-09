@@ -96,7 +96,9 @@
           e.preventDefault();
           const user_id = $("#user_id").val();
           const token = localStorage.getItem("jwtToken");
-          if (!user_id || !token) {
+          console.log(token)
+          console.log(user_id)
+          if (!token || !user_id) {
             alert("enter the user id because your token has expired");
             return;
           }
