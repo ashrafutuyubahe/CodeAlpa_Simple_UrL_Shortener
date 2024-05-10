@@ -1,3 +1,6 @@
+
+require('dotenv').config();
+
 function retrieveShortUrl (req, res) {
     const shortId = req.query.id;
     console.log(shortId);

@@ -10,6 +10,8 @@ const authenticateUser = require("./middlewares/authmiddleware");
 const posturl = require("./routes/addUrl");
 const clickshortUrl = require("./routes/retriveshortUrl");
 const getSpecifUrls = require("./routes/getspecificUrls");
+require('dotenv').config();
+
 
 const swaggerjdc = require("swagger-jsdoc");
 const swagger_ui = require("swagger-ui-express");

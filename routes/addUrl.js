@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const secretKey = "privatekey";
 const db = require("../models/dbconnection");
 const postUrldata= require('../controllers/addurl');
+require('dotenv').config()
 
 
 

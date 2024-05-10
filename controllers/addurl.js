@@ -1,6 +1,6 @@
 const shortid = require("short-id");
 const jwt = require("jsonwebtoken");
-const secretKey = "privatekey";
+const secretKey = process.env.private_key;
 const db = require("../models/dbconnection");
 require('dotenv').config();
 
