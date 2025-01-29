@@ -10,7 +10,7 @@ function addUrl(req, res) {
   const theUrl = req.body.theURL;
   const user_id = req.body.user_id;
   const shortId = shortid.generate();
-  console.log(user_id);
+
 
   const expiresInDuration = 2 * 60;
   const token = jwt.sign({ user_id: user_id }, secretKey, {
